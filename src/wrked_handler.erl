@@ -8,5 +8,7 @@
 %%%===================================================================
 
 init(Req, _Opts) ->
-    %% TODO
-    {ok, Req, _State = undefined}.
+    Headers = [{<<"content-type">>, <<"application/vnd.ant.fit">>}],
+    Body = <<>>,                                % TODO
+    Req2 = cowboy_req:reply(200, Headers, Body, Req),
+    {ok, Req2, _State = undefined}.
