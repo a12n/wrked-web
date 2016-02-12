@@ -21,6 +21,16 @@ init(Req, _Opts) ->
 %%% Internal functions
 %%%===================================================================
 
-wrk2fit(_Name, _Sport, _Spec) ->
-    %% TODO
-    <<>>.
+wrk2fit(_Name, _Sport, Spec) ->
+    Path = "/home/arn/tmp/a12n/workoued/wrk2ir/wrk2ir.byte",
+    Port = open_port({spawn_executable, Path}, [binary, stream, use_stdio]),
+    Port ! {self(), {command, [Spec, <<"EOF">>]}},
+    Reply =
+        receive
+            {Port, {data, Data}} ->
+                Data
+        after 1000 ->
+                error(timeout)
+        end,
+    port_close(Port),
+    Reply.
