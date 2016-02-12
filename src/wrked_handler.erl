@@ -8,11 +8,19 @@
 %%%===================================================================
 
 init(Req, _Opts) ->
-    _Name = cowboy_req:binding(name, Req),
-    _Sport = cowboy_req:binding(sport, Req),
-    _Spec = cowboy_req:binding(spec, Req),
+    Name = cowboy_req:binding(name, Req),
+    Sport = cowboy_req:binding(sport, Req),
+    Spec = cowboy_req:binding(spec, Req),
     Headers = [ {<<"content-type">>, <<"application/vnd.ant.fit">>},
                 {<<"content-disposition">>, <<"attachment; filename=xyz.fit">>} ],
-    Body = <<>>,                                % TODO
+    Body = wrk2fit(Name, Sport, Spec),
     Req2 = cowboy_req:reply(200, Headers, Body, Req),
     {ok, Req2, _State = undefined}.
+
+%%%===================================================================
+%%% Internal functions
+%%%===================================================================
+
+wrk2fit(_Name, _Sport, _Spec) ->
+    %% TODO
+    <<>>.
