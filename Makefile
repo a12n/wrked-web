@@ -12,7 +12,7 @@ distclean: clean
 	rm -rf _build/ rebar3
 
 shell: $(REBAR)
-	$(REBAR) as test shell
+	$(REBAR) as test shell --config wrked.config
 
 rebar3:
 	wget "https://s3.amazonaws.com/rebar3/rebar3" -O $@-part
