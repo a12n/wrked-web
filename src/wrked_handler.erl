@@ -8,6 +8,9 @@
 %%%===================================================================
 
 init(Req, _Opts) ->
+    _Name = cowboy_req:binding(name, Req),
+    _Sport = cowboy_req:binding(sport, Req),
+    _Spec = cowboy_req:binding(spec, Req),
     Headers = [ {<<"content-type">>, <<"application/vnd.ant.fit">>},
                 {<<"content-disposition">>, <<"attachment; filename=xyz.fit">>} ],
     Body = <<>>,                                % TODO
