@@ -3,6 +3,8 @@
 %% Common handler callbacks
 -export([init/2]).
 
+-define(FIT_MIME_TYPE, <<"application/vnd.ant.fit">>).
+
 %%%===================================================================
 %%% Common handler callbacks
 %%%===================================================================
@@ -11,7 +13,7 @@ init(Req, _Opts) ->
     Name = cowboy_req:binding(name, Req),
     Sport = cowboy_req:binding(sport, Req),
     Wrk = cowboy_req:binding(wrk, Req),
-    Headers = [ {<<"content-type">>, <<"application/vnd.ant.fit">>},
+    Headers = [ {<<"content-type">>, ?FIT_MIME_TYPE},
                 {<<"content-disposition">>, <<"attachment; filename=xyz.fit">>} ],
     Body = wrk2fit(Name, Sport, Wrk),
     Req2 = cowboy_req:reply(200, Headers, Body, Req),
