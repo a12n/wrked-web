@@ -10,8 +10,16 @@
 %%====================================================================
 
 start(_StartType, _StartArgs) ->
-    Paths = [ {<<"/workouts/:sport/:name/:wrk">>, wrked_handler, []},
-              {<<"/workouts/:sport/:wrk">>, wrked_handler, []},
+    Constr =
+        [ { sport,
+            fun(Sport) ->
+                    lists:member(
+                      Sport, [ <<"cycling">>, <<"running">>,
+                               <<"swimming">>, <<"walking">> ])
+            end }
+        ],
+    Paths = [ {<<"/workouts/:sport/:name/:wrk">>, Constr, wrked_handler, []},
+              {<<"/workouts/:sport/:wrk">>, Constr, wrked_handler, []},
               {<<"/workouts/:wrk">>, wrked_handler, []} ],
     Host = {'_', Paths},
     Dispatch = cowboy_router:compile([Host]),
