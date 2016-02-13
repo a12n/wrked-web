@@ -10,9 +10,9 @@
 %%====================================================================
 
 start(_StartType, _StartArgs) ->
-    Paths = [ {<<"/workouts/:sport/:name/:spec">>, wrked_handler, []},
-              {<<"/workouts/:sport/:spec">>, wrked_handler, []},
-              {<<"/workouts/:spec">>, wrked_handler, []} ],
+    Paths = [ {<<"/workouts/:sport/:name/:wrk">>, wrked_handler, []},
+              {<<"/workouts/:sport/:wrk">>, wrked_handler, []},
+              {<<"/workouts/:wrk">>, wrked_handler, []} ],
     Host = {'_', Paths},
     Dispatch = cowboy_router:compile([Host]),
     Addr = application:get_env(wrked, addr, {127,0,0,1}),
