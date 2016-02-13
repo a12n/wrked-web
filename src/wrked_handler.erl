@@ -14,7 +14,9 @@ init(Req, _Opts) ->
     Sport = cowboy_req:binding(sport, Req),
     Wrk = cowboy_req:binding(wrk, Req),
     Req2 =
-        case wrk2fit(Name, Sport, Wrk) of
+        case wrk2fit([{<<"-name">>, Name},
+                      {<<"-sport">>, Sport}], Wrk)
+        of
             Body when Body =/= undefined ->
                 cowboy_req:reply(
                   200, _Headers =
@@ -27,10 +29,13 @@ init(Req, _Opts) ->
 %%% Internal functions
 %%%===================================================================
 
-wrk2fit(_Name, _Sport, Wrk) ->
-    %% TODO: set -name and -sport args
+wrk2fit(Args, Wrk) ->
+    Args2 = lists:flatmap(
+              fun({_K, _V = undefined}) -> [];
+                 ({K, V}) -> [K, V] end, Args),
     Path = application:get_env(wrked, wrk2fit_path, "/usr/local/bin/wrk2fit"),
-    Port = open_port({spawn_executable, Path}, [binary, stream, use_stdio]),
+    Port = open_port({spawn_executable, Path},
+                     [{args, Args2}, binary, stream, use_stdio]),
     port_command(Port, [Wrk, <<"EOF">>]),
     Fit = receive {Port, {data, Data}} -> Data
           after 1000 -> undefined end,
