@@ -23,10 +23,11 @@ init(Req, _Opts) ->
 %%% Internal functions
 %%%===================================================================
 
-wrk2fit(_Name, _Sport, Spec) ->
+wrk2fit(_Name, _Sport, Wrk) ->
+    %% TODO: set -name and -sport args
     Path = application:get_env(wrked, wrk2fit_path, "/usr/local/bin/wrk2fit"),
     Port = open_port({spawn_executable, Path}, [binary, stream, use_stdio]),
-    port_command(Port, [Spec, <<"EOF">>]),
+    port_command(Port, [Wrk, <<"EOF">>]),
     Reply =
         receive
             {Port, {data, Data}} ->
