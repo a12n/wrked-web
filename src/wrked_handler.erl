@@ -26,7 +26,7 @@ init(Req, _Opts) ->
 wrk2fit(_Name, _Sport, Spec) ->
     Path = application:get_env(wrked, wrk2fit_path, "/usr/local/bin/wrk2fit"),
     Port = open_port({spawn_executable, Path}, [binary, stream, use_stdio]),
-    Port ! {self(), {command, [Spec, <<"EOF">>]}},
+    port_command(Port, [Spec, <<"EOF">>]),
     Reply =
         receive
             {Port, {data, Data}} ->
