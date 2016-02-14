@@ -20,7 +20,10 @@ init(Req, _Opts) ->
             Body when Body =/= undefined ->
                 cowboy_req:reply(
                   200, _Headers =
-                      [ {<<"content-type">>, ?FIT_MIME_TYPE} ],
+                      [ {<<"content-type">>, ?FIT_MIME_TYPE},
+                        {<<"content-disposition">>,
+                         [<<"attachment; filename=">>, filename(Name, Sport)]}
+                      ],
                   Body, Req)
         end,
     {ok, Req2, _State = undefined}.
@@ -28,6 +31,12 @@ init(Req, _Opts) ->
 %%%===================================================================
 %%% Internal functions
 %%%===================================================================
+
+filename(Name, Sport) ->
+    {{Y, M, D}, _Time} = erlang:universaltime(),
+    [ case Name of undefined -> <<>>; _ -> [Name, $-] end,
+      case Sport of undefined -> <<>>; _ -> [Sport, $-] end,
+      io_lib:format("~4..0B~2..0B~2..0B", [Y, M, D]) ].
 
 wrk2fit(Args, Wrk) ->
     Args2 = lists:flatmap(
