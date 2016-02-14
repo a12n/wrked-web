@@ -32,11 +32,18 @@ init(Req, _Opts) ->
 %%% Internal functions
 %%%===================================================================
 
-filename(Name, Sport) ->
+filename(_Name = undefined, Sport) ->
     {{Y, M, D}, _Time} = erlang:universaltime(),
-    [ case Name of undefined -> <<>>; _ -> [Name, $-] end,
-      case Sport of undefined -> <<>>; _ -> [Sport, $-] end,
-      io_lib:format("~4..0B~2..0B~2..0B", [Y, M, D]) ].
+    [ <<"workout-">>,
+      case Sport of
+          undefined -> <<>>;
+          _Other -> [Sport, $-]
+      end,
+      io_lib:format("~4..0B~2..0B~2..0B", [Y, M, D]),
+      <<".fit">> ];
+
+filename(Name, _Sport) ->
+    [ <<"workout-">>, Name, <<".fit">> ].
 
 wrk2fit(Args, Wrk) ->
     Args2 = lists:flatmap(
