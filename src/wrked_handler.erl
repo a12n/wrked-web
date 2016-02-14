@@ -45,14 +45,14 @@ filename(Name, _Sport) ->
     [ <<"workout-">>, Name, <<".fit">> ].
 
 wrk2fit(Name, Sport, Wrk) ->
-    Args2 = lists:flatmap(
-              fun({_K, _V = undefined}) -> [];
-                 ({K, V}) -> [K, V] end,
-              [ {<<"-name">>, Name},
-                {<<"-sport">>, Sport} ]),
+    Args = lists:flatmap(
+             fun({_K, _V = undefined}) -> [];
+                ({K, V}) -> [K, V] end,
+             [ {<<"-name">>, Name},
+               {<<"-sport">>, Sport} ]),
     Path = application:get_env(wrked, wrk2fit_path, "/usr/local/bin/wrk2fit"),
     Port = open_port({spawn_executable, Path},
-                     [{args, Args2}, binary, stream, use_stdio]),
+                     [{args, Args}, binary, stream, use_stdio]),
     port_command(Port, [Wrk, <<"EOF">>]),
     Fit = receive {Port, {data, Data}} -> Data
           after 1000 -> undefined end,
