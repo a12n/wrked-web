@@ -33,13 +33,14 @@ init(Req, _Opts) ->
 %%%===================================================================
 
 filename(_Name = undefined, Sport) ->
-    {{Y, M, D}, _Time} = erlang:universaltime(),
+    {{Y, M, D}, {H, N, _S}} = erlang:universaltime(),
     [ <<"workout-">>,
       case Sport of
           undefined -> <<>>;
           _Other -> [Sport, $-]
       end,
-      io_lib:format("~4..0B~2..0B~2..0B", [Y, M, D]),
+      io_lib:format("~4..0B~2..0B~2..0BT~2..0B~2..0BZ",
+                    [Y, M, D, H, N]),
       <<".fit">> ];
 
 filename(Name, _Sport) ->
