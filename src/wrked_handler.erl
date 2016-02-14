@@ -15,14 +15,15 @@ init(Req, _Opts) ->
     Wrk = cowboy_req:binding(wrk, Req),
     Req2 =
         case wrk2fit(Name, Sport, Wrk) of
-            Body when Body =/= undefined ->
+            {ok, Body} ->
                 cowboy_req:reply(
                   200, _Headers =
                       [ {<<"content-type">>, ?FIT_MIME_TYPE},
                         {<<"content-disposition">>,
                          [<<"attachment; filename=">>, filename(Name, Sport)]}
                       ],
-                  Body, Req)
+                  Body, Req);
+            {error, badarg} -> cowboy_req:reply(400, Req)
         end,
     {ok, Req2, _State = undefined}.
 
@@ -53,8 +54,10 @@ wrk2fit(Name, Sport, Wrk) ->
     Path = application:get_env(wrked, wrk2fit_path, "/usr/local/bin/wrk2fit"),
     Port = open_port({spawn_executable, Path},
                      [{args, Args}, binary, exit_status]),
+    link(Port),
     port_command(Port, [Wrk, <<"EOF">>]),
-    Fit = receive {Port, {data, Data}} -> Data
-          after 1000 -> undefined end,
-    port_close(Port),
-    Fit.
+    receive
+        {Port, {data, Fit}} -> {ok, Fit};
+        {Port, {exit_status, Code}} when Code =/= 0 -> {error, badarg}
+    after 1000 -> {error, timeout}
+    end.
