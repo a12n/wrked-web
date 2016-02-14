@@ -52,7 +52,7 @@ wrk2fit(Name, Sport, Wrk) ->
                {<<"-sport">>, Sport} ]),
     Path = application:get_env(wrked, wrk2fit_path, "/usr/local/bin/wrk2fit"),
     Port = open_port({spawn_executable, Path},
-                     [{args, Args}, binary, stream, use_stdio]),
+                     [{args, Args}, binary, exit_status]),
     port_command(Port, [Wrk, <<"EOF">>]),
     Fit = receive {Port, {data, Data}} -> Data
           after 1000 -> undefined end,
