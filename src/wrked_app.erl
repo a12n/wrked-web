@@ -20,7 +20,11 @@ start(_StartType, _StartArgs) ->
         ],
     Paths = [ {<<"/workouts/:sport/:name/:wrk">>, Constr, wrked_handler, []},
               {<<"/workouts/:sport/:wrk">>, Constr, wrked_handler, []},
-              {<<"/workouts/:wrk">>, wrked_handler, []} ],
+              {<<"/workouts/:wrk">>, wrked_handler, []},
+              {<<"/">>, cowboy_static, {priv_file, wrked, <<"index.html">>}},
+              {<<"/[...]">>, cowboy_static,
+               {priv_dir, wrked, <<"">>, [{mimetypes, cow_mimetypes, all}]}}
+            ],
     Host = {'_', Paths},
     Dispatch = cowboy_router:compile([Host]),
     Addr = application:get_env(wrked, addr, {127,0,0,1}),
