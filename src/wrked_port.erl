@@ -34,7 +34,6 @@ wrk2fit(Wrk, Name, Sport) ->
     Path = application:get_env(wrked, wrk2fit_path, "bin/wrk2fit"),
     Port = open_port({spawn_executable, Path},
                      [{args, Args}, binary, exit_status]),
-    link(Port),
     port_command(Port, [Wrk, <<"EOF">>]),
     receive_loop(Port, _Fit = []).
 
