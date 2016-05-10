@@ -36,8 +36,16 @@ wrk2fit(Wrk, Name, Sport) ->
                      [{args, Args}, binary, exit_status]),
     link(Port),
     port_command(Port, [Wrk, <<"EOF">>]),
+    receive_loop(Port, _Fit = []).
+
+%%%===================================================================
+%%% Internal functions
+%%%===================================================================
+
+receive_loop(Port, Fit) ->
     receive
-        {Port, {data, Fit}} -> {ok, Fit};
-        {Port, {exit_status, Code}} when Code =/= 0 -> {error, badarg}
-    after 1000 -> {error, timeout}
+        {Port, {data, Data}} -> receive_loop(Port, [Fit, Data]);
+        {Port, {exit_status, 0}} -> {ok, Fit};
+        {Port, {exit_status, _Code}} -> {error, badarg}
+    after 1000 -> port_close(Port), {error, timeout}
     end.
