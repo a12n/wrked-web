@@ -1,7 +1,7 @@
 -module(wrked_port).
 
 %% API
--export([il2fit/1, wrk2fit/1, wrk2fit/3]).
+-export([il2fit/1, wrk2fit/1, wrk2fit/3, wrk2il/1, wrk2il/3]).
 
 %%%===================================================================
 %%% API
@@ -40,6 +40,34 @@ wrk2fit(Wrk) ->
 wrk2fit(Wrk, Name, Sport) ->
     exec(
       _Path = application:get_env(wrked, wrk2fit_path, "bin/wrk2fit"),
+      _Args = lists:flatmap(
+                fun({_K, _V = undefined}) -> [];
+                   ({K, V}) -> [K, V] end,
+                [ {<<"-name">>, Name},
+                  {<<"-sport">>, Sport} ]),
+      _Body = [Wrk, <<"EOF">>]
+     ).
+
+%%--------------------------------------------------------------------
+%% @doc
+%% @end
+%%--------------------------------------------------------------------
+-spec wrk2il(iodata()) -> {ok, iodata()} | error | timeout.
+
+wrk2il(Wrk) ->
+    wrk2il(Wrk, _Name = undefined, _Sport = undefined).
+
+%%--------------------------------------------------------------------
+%% @doc
+%% @end
+%%--------------------------------------------------------------------
+-spec wrk2il(iodata(),
+             binary() | undefined,
+             binary() | undefined) -> {ok, iodata()} | error | timeout.
+
+wrk2il(Wrk, Name, Sport) ->
+    exec(
+      _Path = application:get_env(wrked, wrk2il_path, "bin/wrk2il"),
       _Args = lists:flatmap(
                 fun({_K, _V = undefined}) -> [];
                    ({K, V}) -> [K, V] end,

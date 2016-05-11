@@ -1,5 +1,5 @@
 {application, wrked,
  [ {description, "FIT workout editor"},
-   {vsn, "0.3.8"},
+   {vsn, "0.3.9"},
    {applications, [cowboy, kernel, stdlib]},
    {mod, {wrked_app, []}} ]}.
