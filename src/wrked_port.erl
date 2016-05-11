@@ -42,16 +42,15 @@ wrk2fit(Wrk) ->
               binary() | undefined) -> {ok, iodata()} | error | timeout.
 
 wrk2fit(Wrk, Name, Sport) ->
-    Args = lists:flatmap(
-             fun({_K, _V = undefined}) -> [];
-                ({K, V}) -> [K, V] end,
-             [ {<<"-name">>, Name},
-               {<<"-sport">>, Sport} ]),
-    Path = application:get_env(wrked, wrk2fit_path, "bin/wrk2fit"),
-    Port = open_port({spawn_executable, Path},
-                     [{args, Args}, binary, exit_status]),
-    port_command(Port, [Wrk, <<"EOF">>]),
-    receive_loop(Port, _Fit = []).
+    exec(
+      _Path = application:get_env(wrked, wrk2fit_path, "bin/wrk2fit"),
+      _Args = lists:flatmap(
+                fun({_K, _V = undefined}) -> [];
+                   ({K, V}) -> [K, V] end,
+                [ {<<"-name">>, Name},
+                  {<<"-sport">>, Sport} ]),
+      _Body = [Wrk, <<"EOF">>]
+     ).
 
 %%%===================================================================
 %%% Internal functions
