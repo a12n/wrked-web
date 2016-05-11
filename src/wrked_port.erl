@@ -1,7 +1,7 @@
 -module(wrked_port).
 
 %% API
--export([il2fit/1, wrk2fit/1, wrk2fit/3, wrk2il/1, wrk2il/3]).
+-export([il2fit/1, wrk2fit/1, wrk2fit/3, wrk2il/2, wrk2il/4]).
 
 %%%===================================================================
 %%% API
@@ -38,7 +38,7 @@ wrk2fit(Wrk) ->
               binary() | undefined) -> {ok, iodata()} | error | timeout.
 
 wrk2fit(Wrk, Name, Sport) ->
-    case wrk2il(Wrk, Name, Sport) of
+    case wrk2il(Wrk, translate, Name, Sport) of
         {ok, Il} -> il2fit(Il);
         error    -> error;
         timeout  -> timeout
@@ -48,27 +48,33 @@ wrk2fit(Wrk, Name, Sport) ->
 %% @doc
 %% @end
 %%--------------------------------------------------------------------
--spec wrk2il(iodata()) -> {ok, iodata()} | error | timeout.
+-spec wrk2il(iodata(), translate | minimize) ->
+                    {ok, iodata()} | error | timeout.
 
-wrk2il(Wrk) ->
-    wrk2il(Wrk, _Name = undefined, _Sport = undefined).
+wrk2il(Wrk, Mode) ->
+    wrk2il(Wrk, Mode, _Name = undefined, _Sport = undefined).
 
 %%--------------------------------------------------------------------
 %% @doc
 %% @end
 %%--------------------------------------------------------------------
--spec wrk2il(iodata(),
+-spec wrk2il(iodata(), translate | minimize,
              binary() | undefined,
              binary() | undefined) -> {ok, iodata()} | error | timeout.
 
-wrk2il(Wrk, Name, Sport) ->
+wrk2il(Wrk, Mode, Name, Sport) ->
     exec(
       _Path = application:get_env(wrked, wrk2il_path, "bin/wrk2il"),
       _Args = lists:flatmap(
                 fun({_K, _V = undefined}) -> [];
                    ({K, V}) -> [K, V] end,
                 [ {<<"-name">>, Name},
-                  {<<"-sport">>, Sport} ]),
+                  {<<"-sport">>, Sport},
+                  {<<"-mode">>,
+                   case Mode of
+                       translate -> <<"tr">>;
+                       minimize  -> <<"min">>
+                   end} ]),
       _Body = [Wrk, <<"EOF">>]
      ).
 
