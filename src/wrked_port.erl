@@ -11,23 +11,6 @@
 %% @doc
 %% @end
 %%--------------------------------------------------------------------
--spec exec(file:name(), [string() | binary()], iodata()) ->
-                  {ok, iodata()} | error | timeout.
-
-exec(Path, Args, Body) ->
-    Port = open_port({spawn_executable, Path},
-                     [{args, Args}, binary, exit_status]),
-    port_command(Port, Body),
-    receive_loop(Port, _Ans = []).
-
-%%%===================================================================
-%%% API
-%%%===================================================================
-
-%%--------------------------------------------------------------------
-%% @doc
-%% @end
-%%--------------------------------------------------------------------
 -spec wrk2fit(iodata()) -> {ok, iodata()} | error | timeout.
 
 wrk2fit(Wrk) ->
@@ -55,6 +38,20 @@ wrk2fit(Wrk, Name, Sport) ->
 %%%===================================================================
 %%% Internal functions
 %%%===================================================================
+
+%%--------------------------------------------------------------------
+%% @private
+%% @doc
+%% @end
+%%--------------------------------------------------------------------
+-spec exec(file:name(), [string() | binary()], iodata()) ->
+                  {ok, iodata()} | error | timeout.
+
+exec(Path, Args, Body) ->
+    Port = open_port({spawn_executable, Path},
+                     [{args, Args}, binary, exit_status]),
+    port_command(Port, Body),
+    receive_loop(Port, _Ans = []).
 
 receive_loop(Port, Ans) ->
     receive
