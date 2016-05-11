@@ -41,10 +41,10 @@ wrk2fit(Wrk, Name, Sport) ->
 %%% Internal functions
 %%%===================================================================
 
-receive_loop(Port, Fit) ->
+receive_loop(Port, Ans) ->
     receive
-        {Port, {data, Data}} -> receive_loop(Port, [Fit, Data]);
-        {Port, {exit_status, 0}} -> {ok, Fit};
+        {Port, {data, Data}} -> receive_loop(Port, [Ans, Data]);
+        {Port, {exit_status, 0}} -> {ok, Ans};
         {Port, {exit_status, _Code}} -> {error, badarg}
     after 1000 -> port_close(Port), {error, timeout}
     end.
