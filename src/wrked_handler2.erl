@@ -26,7 +26,7 @@ content_types_provided(Req, State) ->
     {Result, Req, State}.
 
 last_modified(Req, State) ->
-    Result = {{2016,02,08}, {14,40,43}},
+    Result = {{2016,05,10}, {22,24,43}},
     {Result, Req, State}.
 
 malformed_request(Req, State) ->
