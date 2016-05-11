@@ -11,7 +11,7 @@ clean: $(REBAR)
 distclean: clean
 	rm -rf _build/ rebar3
 
-rel:
+rel: $(REBAR)
 	$(REBAR) release
 
 shell: $(REBAR)
