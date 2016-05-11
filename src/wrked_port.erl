@@ -53,6 +53,13 @@ exec(Path, Args, Body) ->
     port_command(Port, Body),
     receive_loop(Port, _Ans = []).
 
+%%--------------------------------------------------------------------
+%% @private
+%% @doc
+%% @end
+%%--------------------------------------------------------------------
+-spec receive_loop(port(), iodata()) -> {ok, iodata()} | error | timeout.
+
 receive_loop(Port, Ans) ->
     receive
         {Port, {data, Data}} -> receive_loop(Port, [Ans, Data]);
