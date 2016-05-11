@@ -38,15 +38,11 @@ wrk2fit(Wrk) ->
               binary() | undefined) -> {ok, iodata()} | error | timeout.
 
 wrk2fit(Wrk, Name, Sport) ->
-    exec(
-      _Path = application:get_env(wrked, wrk2fit_path, "bin/wrk2fit"),
-      _Args = lists:flatmap(
-                fun({_K, _V = undefined}) -> [];
-                   ({K, V}) -> [K, V] end,
-                [ {<<"-name">>, Name},
-                  {<<"-sport">>, Sport} ]),
-      _Body = [Wrk, <<"EOF">>]
-     ).
+    case wrk2il(Wrk, Name, Sport) of
+        {ok, Il} -> il2fit(Il);
+        error    -> error;
+        timeout  -> timeout
+    end.
 
 %%--------------------------------------------------------------------
 %% @doc
