@@ -18,9 +18,9 @@ start(_StartType, _StartArgs) ->
                                <<"swimming">>, <<"walking">> ])
             end }
         ],
-    Paths = [ {<<"/workouts/:sport/:name/:wrk">>, Constr, wrked_handler, []},
-              {<<"/workouts/:sport/:wrk">>, Constr, wrked_handler, []},
-              {<<"/workouts/:wrk">>, wrked_handler, []},
+    Paths = [ {<<"/workouts/:sport/:name/:wrk">>, Constr, wrked_handler2, []},
+              {<<"/workouts/:sport/:wrk">>, Constr, wrked_handler2, []},
+              {<<"/workouts/:wrk">>, wrked_handler2, []},
               {<<"/">>, cowboy_static, {priv_file, wrked, <<"index.html">>}},
               {<<"/[...]">>, cowboy_static,
                {priv_dir, wrked, <<"">>, [{mimetypes, cow_mimetypes, all}]}}
