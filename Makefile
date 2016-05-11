@@ -1,6 +1,6 @@
 REBAR ?= ./rebar3
 
-.PHONY: all clean distclean shell
+.PHONY: all clean distclean rel shell
 
 all: $(REBAR)
 	$(REBAR) compile
@@ -10,6 +10,9 @@ clean: $(REBAR)
 
 distclean: clean
 	rm -rf _build/ rebar3
+
+rel:
+	$(REBAR) release
 
 shell: $(REBAR)
 	$(REBAR) as test shell --config wrked.config
