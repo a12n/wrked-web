@@ -12,7 +12,7 @@
 %% @end
 %%--------------------------------------------------------------------
 -spec exec(file:name(), [string() | binary()], iodata()) ->
-                  {ok, iodata()} | {error, badarg | timeout}.
+                  {ok, iodata()} | error | timeout.
 
 exec(Path, Args, Body) ->
     Port = open_port({spawn_executable, Path},
@@ -28,7 +28,7 @@ exec(Path, Args, Body) ->
 %% @doc
 %% @end
 %%--------------------------------------------------------------------
--spec wrk2fit(iodata()) -> {ok, iodata()} | {error, badarg | timeout}.
+-spec wrk2fit(iodata()) -> {ok, iodata()} | error | timeout.
 
 wrk2fit(Wrk) ->
     wrk2fit(Wrk, _Name = undefined, _Sport = undefined).
@@ -39,8 +39,7 @@ wrk2fit(Wrk) ->
 %%--------------------------------------------------------------------
 -spec wrk2fit(iodata(),
               binary() | undefined,
-              binary() | undefined) -> {ok, iodata()} |
-                                       {error, badarg | timeout}.
+              binary() | undefined) -> {ok, iodata()} | error | timeout.
 
 wrk2fit(Wrk, Name, Sport) ->
     Args = lists:flatmap(
@@ -62,6 +61,6 @@ receive_loop(Port, Ans) ->
     receive
         {Port, {data, Data}} -> receive_loop(Port, [Ans, Data]);
         {Port, {exit_status, 0}} -> {ok, Ans};
-        {Port, {exit_status, _Code}} -> {error, badarg}
-    after 1000 -> port_close(Port), {error, timeout}
+        {Port, {exit_status, _Code}} -> error
+    after 1000 -> port_close(Port), timeout
     end.

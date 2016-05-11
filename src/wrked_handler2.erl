@@ -40,8 +40,7 @@ malformed_request(Req, State) ->
                      [<<"attachment; filename=">>, filename(Name, Sport)],
                      Req),
             {false, Req2, _State = Fit};
-        {error, badarg} ->
-            {true, Req, State}
+        error -> {true, Req, State}
     end.
 
 %%%===================================================================
