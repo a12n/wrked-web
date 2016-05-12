@@ -22,7 +22,11 @@
 %%%===================================================================
 
 init(Req, _Opts) ->
-    {cowboy_rest, Req, _State = undefined}.
+    Name = cowboy_req:binding(name, Req),
+    Sport = cowboy_req:binding(sport, Req),
+    Wrk = cowboy_req:binding(wrk, Req),
+    State = #state{name = Name, sport = Sport, wrk = Wrk},
+    {cowboy_rest, Req, State}.
 
 %%%===================================================================
 %%% REST handler callbacks
@@ -36,17 +40,15 @@ last_modified(Req, State) ->
     Result = {{2016,05,10}, {22,24,43}},
     {Result, Req, State}.
 
-malformed_request(Req, State) ->
-    Name = cowboy_req:binding(name, Req),
-    Sport = cowboy_req:binding(sport, Req),
-    Wrk = cowboy_req:binding(wrk, Req),
+malformed_request(Req, State = #state{wrk = Wrk, name = Name,
+                                      sport = Sport}) ->
     case wrked_port:wrk2fit(Wrk, Name, Sport) of
         {ok, Fit} ->
             Req2 = cowboy_req:set_resp_header(
                      <<"content-disposition">>,
                      [<<"attachment; filename=">>, filename(Name, Sport)],
                      Req),
-            {false, Req2, _State = Fit};
+            {false, Req2, State#state{fit = Fit}};
         error -> {true, Req, State}
     end.
 
@@ -54,7 +56,7 @@ malformed_request(Req, State) ->
 %%% API
 %%%===================================================================
 
-to_fit(Req, State = Fit) -> {Fit, Req, State}.
+to_fit(Req, State = #state{fit = Fit}) -> {Fit, Req, State}.
 
 %%%===================================================================
 %%% Internal functions
