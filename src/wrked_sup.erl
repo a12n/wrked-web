@@ -21,5 +21,6 @@ start_link() ->
 %% Supervisor callbacks
 %%====================================================================
 
-init([]) ->
-    {ok, {{one_for_all, 0, 1}, []}}.
+init(_Opts) ->
+    Cache = wrked_cache:child_spec(),
+    {ok, {_SupFlags = #{}, [Cache]}}.
