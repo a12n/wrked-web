@@ -94,7 +94,7 @@ exec(Path, Args, Body) ->
     Port = open_port({spawn_executable, Path},
                      [{args, Args}, binary, exit_status]),
     port_command(Port, Body),
-    receive_loop(Port, _Ans = []).
+    receive_loop(Port, _Ans = <<>>).
 
 %%--------------------------------------------------------------------
 %% @private
