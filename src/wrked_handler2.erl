@@ -25,7 +25,12 @@ init(Req, _Opts) ->
     Name = cowboy_req:binding(name, Req),
     Sport = cowboy_req:binding(sport, Req),
     Wrk = cowboy_req:binding(wrk, Req),
-    State = #state{name = Name, sport = Sport, wrk = Wrk},
+    Fit = case wrked_cache:fetch(Wrk) of
+              {ok, Cached} -> Cached;
+              error        -> undefined
+          end,
+    State = #state{name = Name, sport = Sport,
+                   wrk = Wrk, fit = Fit},
     {cowboy_rest, Req, State}.
 
 %%%===================================================================
@@ -40,23 +45,47 @@ last_modified(Req, State) ->
     Result = {{2016,05,10}, {22,24,43}},
     {Result, Req, State}.
 
+%% Fetched from the cache, Wrk was valid
+malformed_request(Req, State = #state{fit = Fit})
+  when Fit =/= undefined ->
+    {false, Req, State};
+
+%% Not in the cache yet, Wrk may be malformed
 malformed_request(Req, State = #state{wrk = Wrk, name = Name,
                                       sport = Sport}) ->
-    case wrked_port:wrk2fit(Wrk, Name, Sport) of
-        {ok, Fit} ->
+    case wrked_port:wrk2il(Wrk, minimize, Name, Sport) of
+        {ok, RawMinWrk} ->
+            %% Proper Wrk, was able to minimize
+            MinWrk = iolist_to_binary(RawMinWrk),
+            Fit = case wrked_cache:fetch(MinWrk) of
+                      {ok, Cached} -> Cached;
+                      error        -> undefined
+                  end,
             Req2 = cowboy_req:set_resp_header(
                      <<"content-disposition">>,
-                     [<<"attachment; filename=">>, filename(Name, Sport)],
+                     [<<"attachment; filename=">>,
+                      filename(Name, Sport)],
                      Req),
-            {false, Req2, State#state{fit = Fit}};
-        error -> {true, Req, State}
+            {false, Req2, State#state{wrk = MinWrk, fit = Fit}};
+        error ->
+            %% Malformed Wrk
+            {true, Req, State}
     end.
 
 %%%===================================================================
 %%% API
 %%%===================================================================
 
-to_fit(Req, State = #state{fit = Fit}) -> {Fit, Req, State}.
+%% Wrk or MinWrk was in the cache, Fit is already fetched
+to_fit(Req, State = #state{fit = Fit})
+  when Fit =/= undefined ->
+    {Fit, Req, State};
+
+%% Wasn't cached, generate Fit
+to_fit(Req, State = #state{wrk = Wrk}) ->
+    {ok, Fit} = wrked_port:wrk2fit(Wrk),
+    wrked_cache:store(Wrk, Fit),
+    {Fit, Req, State}.
 
 %%%===================================================================
 %%% Internal functions
