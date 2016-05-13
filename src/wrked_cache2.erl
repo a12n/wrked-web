@@ -42,7 +42,7 @@ start_link() ->
 %% @doc
 %% @end
 %%--------------------------------------------------------------------
--spec fetch(iodata()) -> {ok, iodata()} | error.
+-spec fetch(binary()) -> {ok, iodata()} | error.
 
 fetch(Wrk) ->
     gen_server:call(?MODULE, {fetch, Wrk}).
