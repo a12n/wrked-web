@@ -86,7 +86,9 @@ handle_call({fetch, Wrk}, _From, State) ->
 %% @end
 %%--------------------------------------------------------------------
 handle_cast({store, Wrk, Fit}, State) ->
-    file:write_file(filename(Wrk), Fit),
+    Filename = filename(Wrk),
+    filelib:ensure_dir(Filename),
+    file:write_file(Filename, Fit),
     {noreply, State}.
 
 %%--------------------------------------------------------------------
