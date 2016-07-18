@@ -61,11 +61,7 @@ malformed_request(Req, State = #state{wrk = Wrk, name = Name,
                       {ok, Cached} -> Cached;
                       error        -> undefined
                   end,
-            Req2 = cowboy_req:set_resp_header(
-                     <<"content-disposition">>,
-                     [<<"attachment; filename=">>,
-                      filename(Name, Sport)],
-                     Req),
+            Req2 = set_content_disposition(filename(Name, Sport), Req),
             {false, Req2, State#state{wrk = MinWrk, fit = Fit}};
         error ->
             %% Malformed Wrk
@@ -105,3 +101,9 @@ filename(Name, Sport) ->
          _SomeName -> Name
      end,
      <<".fit">>].
+
+set_content_disposition(Filename, Req) ->
+    cowboy_req:set_resp_header(
+      <<"content-disposition">>,
+      [<<"attachment; filename=">>, Filename],
+      Req).
