@@ -1,4 +1,4 @@
--module(wrked_cache2).
+-module(wrked_file_cache).
 
 -behaviour(gen_server).
 
