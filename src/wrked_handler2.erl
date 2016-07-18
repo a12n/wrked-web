@@ -46,9 +46,10 @@ last_modified(Req, State) ->
     {Result, Req, State}.
 
 %% Fetched from the cache, Wrk was valid
-malformed_request(Req, State = #state{fit = Fit})
+malformed_request(Req, State = #state{name = Name, sport = Sport, fit = Fit})
   when Fit =/= undefined ->
-    {false, Req, State};
+    Req2 = set_content_disposition(filename(Name, Sport), Req),
+    {false, Req2, State};
 
 %% Not in the cache yet, Wrk may be malformed
 malformed_request(Req, State = #state{wrk = Wrk, name = Name,
