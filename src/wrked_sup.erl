@@ -22,5 +22,5 @@ start_link() ->
 %%====================================================================
 
 init(_Opts) ->
-    Cache = wrked_cache:child_spec(),
+    Cache = wrked_ets_cache:child_spec(),
     {ok, {_SupFlags = #{}, [Cache]}}.

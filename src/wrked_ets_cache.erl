@@ -1,4 +1,4 @@
--module(wrked_cache).
+-module(wrked_ets_cache).
 
 -behaviour(gen_server).
 

@@ -25,7 +25,7 @@ init(Req, _Opts) ->
     Name = cowboy_req:binding(name, Req),
     Sport = cowboy_req:binding(sport, Req),
     Wrk = cowboy_req:binding(wrk, Req),
-    Fit = case wrked_cache:fetch(Wrk) of
+    Fit = case wrked_ets_cache:fetch(Wrk) of
               {ok, Cached} -> Cached;
               error        -> undefined
           end,
@@ -58,7 +58,7 @@ malformed_request(Req, State = #state{wrk = Wrk, name = Name,
         {ok, RawMinWrk} ->
             %% Proper Wrk, was able to minimize
             MinWrk = iolist_to_binary(RawMinWrk),
-            Fit = case wrked_cache:fetch(MinWrk) of
+            Fit = case wrked_ets_cache:fetch(MinWrk) of
                       {ok, Cached} -> Cached;
                       error        -> undefined
                   end,
@@ -81,7 +81,7 @@ to_fit(Req, State = #state{fit = Fit})
 %% Wasn't cached, generate Fit
 to_fit(Req, State = #state{wrk = Wrk}) ->
     {ok, Fit} = wrked_port:wrk2fit(Wrk),
-    wrked_cache:store(Wrk, Fit),
+    wrked_ets_cache:store(Wrk, Fit),
     {Fit, Req, State}.
 
 %%%===================================================================
